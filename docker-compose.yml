@@ -1,3 +1,4 @@
+version: "3"
 services:
   qbittorrent:
     image: 'markusmcnugen/qbittorrentvpn:latest'
@@ -164,7 +165,7 @@ services:
     image: 'containerrr/watchtower:latest'
     container_name: watchtower
     environment:
-      - WATCHTOWER_CLEANUP = true
+      - WATCHTOWER_CLEANUP=true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
@@ -206,7 +207,7 @@ services:
     privileged: true
     networks: host
     ports:
-      -8123:8123
+      - 8123:8123
     environment:
       - TZ=${TZ}
     volumes:
@@ -218,9 +219,9 @@ services:
     container_name: portainer
     privileged: true
     ports:
-      -9000:9000
-      -8000:8000
-      -9443:9443
+      - 9000:9000
+      - 8000:8000
+      - 9443:9443
     volumes:
       - /var/lib/docker/volumes:/var/lib/docker/volumes 
       - /var/run/docker.sock:/var/run/docker.sock 
