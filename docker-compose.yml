@@ -170,26 +170,46 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
 
-  pihole:
-    image: 'pihole/pihole:latest'
+#  pihole:
+#    image: 'pihole/pihole:latest'
+#    container_name: pihole
+#    ports:
+#      - 53:53/tcp
+#      - 53:53/udp
+#      - 67:67/udp
+#      - 80:80/tcp
+#    environment:
+#      - PIHOLE_DNS_ = 127.0.0.1, 1.1.1.1
+#      - TZ = ${TZ}
+#      - ServerIP = ${IP}
+#    volumes:
+#      - ./etc-pihole/:/etc/pihole/
+#      - ./etc-dnsmasq.d/:/etc/dnsmasq.d/
+#    cap_add:
+#     - NET_ADMIN
+#    networks:
+#      macvlan_network:
+#        ipv4_address: ${pi_hole_ip}
+#    restart: unless-stopped
+
+  AdGuard:
+    image: 'adguard/adguardhome'
     container_name: pihole
     ports:
       - 53:53/tcp
       - 53:53/udp
-      - 67:67/udp
       - 80:80/tcp
-    environment:
-      - PIHOLE_DNS_ = 127.0.0.1, 1.1.1.1
-      - TZ = ${TZ}
-      - ServerIP = ${IP}
+      - 443:443/tcp
+      - 443:443/udp
+      - 3001:3000/tcp
     volumes:
-      - './etc-pihole/:/etc/pihole/'
-      - './etc-dnsmasq.d/:/etc/dnsmasq.d/'
+      - ${config}/adguard:/opt/adguardhome/work
+      - ${config}/adguard:/opt/adguardhome/conf
     cap_add:
-      - NET_ADMIN
+     - NET_ADMIN
     networks:
       macvlan_network:
-        ipv4_address: ${pi_hole_ip}
+        ipv4_address: ${AdGuard}
     restart: unless-stopped
 
   autoheal:
@@ -249,6 +269,24 @@ services:
       - OOKLA_EULA_GDPR=true
     volumes:
       - ${config}/speedtest:/config 
+
+  plex:
+    image: plexinc/pms-docker
+    container_name: plex
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+    ports:
+      - 32400:32400
+    volumes:
+      - ${config}:/config
+      - ${tv}:/tv
+      - ${movies}:/movies
+      - ${transcode}:/transcode
+    devices:
+      - /dev/dri:/dev/dri
+    restart: unless-stopped
 
 networks:
   vlan:
