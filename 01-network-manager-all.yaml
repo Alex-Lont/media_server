@@ -1,0 +1,14 @@
+# Let NetworkManager manage all devices on this system
+network:
+  version: 2
+  ethernets:
+      NETWORK_DRIVER:
+          addresses: 
+            - IP_ADRESS/24
+          gateway4: GATEWAY_IP
+          dhcp4: no
+          nameservers:
+              addresses: NAMESERVER_IP
+  
+
+

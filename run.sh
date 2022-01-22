@@ -5,8 +5,8 @@ export $(egrep -v '^#' .env | xargs)
 
 apt install -y net-tools 
 #set static ip
-sed -r 's/^(\s*)(addresses\s*:\s*nginx\s*$)/\1image: apache/' file
 
+sed 's/${network_driver}/${network_driver}' ./01-network-manager-all.yaml
 cp ./01-network-manager-all.yaml /etc/netplan/01-network-manager-all.yaml
 netplan apply
 ifconfig
