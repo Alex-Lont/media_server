@@ -14,7 +14,6 @@ netplan apply
 ifconfig
 
 #Docker install for linux *note using ubuntu 20.04
-
 curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
 
@@ -23,14 +22,15 @@ usermod -aG docker $USER
 newgrp docker
 
 #for hardware acceleration for plex *note using a quatro P400
-#distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
-curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
-curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
+   && curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add - \
+   && curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
 
-apt-get update && apt-get install -y nvidia-container-toolkit
+apt update
+apt install -y nvidia-docker2
 systemctl restart docker
 
-#ip link add ${DOCKER_ROUTING_INTERFACE_NAME} link ${network_driver} type macvlan mode bridge 
-#ip addr add ${DOCKERNETWORK_IP_ADDRESS} dev ${DOCKER_ROUTING_INTERFACE_NAME} 
-#ip link set ${DOCKER_ROUTING_INTERFACE_NAME} up
-#ip route add ${DOCKERNETWORK_IP_RANGE} dev ${DOCKER_ROUTING_INTERFACE_NAME}
+ip link add ${DOCKER_ROUTING_INTERFACE_NAME} link ${network_driver} type macvlan mode bridge 
+ip addr add ${DOCKERNETWORK_IP_ADDRESS} dev ${DOCKER_ROUTING_INTERFACE_NAME} 
+ip link set ${DOCKER_ROUTING_INTERFACE_NAME} up
+ip route add ${DOCKERNETWORK_IP_RANGE} dev ${DOCKER_ROUTING_INTERFACE_NAME}

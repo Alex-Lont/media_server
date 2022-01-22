@@ -13,7 +13,7 @@ services:
       - LAN_NETWORK=${LAN_NETWORK}
       - NAME_SERVERS=8.8.8.8,8.8.4.4
     volumes:
-      - ${config}/Qbittorrent:/config
+      - ${config}/qbittorrent:/config
       - ${downloads}:/downloads
     ports:
       - 8080:8080
@@ -35,7 +35,7 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
     volumes:
-      - ${config}/Jacket:/config
+      - ${config}/jacket:/config
     ports:
       - 9117:9117
     restart: unless-stopped
@@ -70,6 +70,21 @@ services:
       - 8989:8989
     restart: unless-stopped
 
+  bazarr:
+    image: 'linuxserver/bazarr'
+    container_name: bazarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${config}/sonarr:/config
+      - ${tv}:/tv
+      - ${movies}:/movies
+    ports:
+      - 6767:6767
+    restart: unless-stopped
+
   organizr:
     container_name: organizr
     hostname: organizr
@@ -77,13 +92,41 @@ services:
     ports:
       - 80:80
     volumes:
-      - ${config}/Organizr:/config
+      - ${config}/organizr:/config
     environment:
       - fpm=true #true or false | using true will provide better performance
       - branch=v2-master #v2-master or #v2-develop
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+    restart: unless-stopped
+
+  wireshark:
+    image: 'linuxserver/wireshark:latest'
+    container_name: wireshark
+    cap_add:
+      - NET_ADMIN
+    network_mode: host
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${config}/wireshark:/config
+    restart: unless-stopped
+
+  code-server:
+    image: 'linuxserver/code-server:latest'
+    container_name: code-server
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - DEFAULT_WORKSPACE=/config/workspace #optional
+    volumes:
+      - ${config}/code-server:/config
+    ports:
+      - 8443:8443
     restart: unless-stopped
 
   prometheus:
@@ -124,7 +167,7 @@ services:
       - TZ=${TZ}
       - UMASK_SET=022
     ports:
-      - 3000:3000
+      - 3030:3000
     restart: unless-stopped
 
   node-red:
@@ -145,20 +188,9 @@ services:
       - 1883:1883
       - 9001:9001
     volumes:
-      - ${config}/MQTT/config:/mosquitto/config
-      - ${config}/MQTT/data:/mosquitto/data 
-      - ${config}/MQTT/log:/mosquitto/log
-    restart: unless-stopped
-
-  nginxproxymanager:
-    image: 'jlesage/nginx-proxy-manager:latest'
-    container_name: nginx-proxy-manager
-    ports:
-      - 8181:8181 #http traffic
-      - 8080:8081 #dashboard location
-      - 4443:4443 #ssh traffic
-    volumes:
-      - ${config}/nginx:/config:rw
+      - ${config}/mqtt/config:/mosquitto/config
+      - ${config}/mqtt/data:/mosquitto/data 
+      - ${config}/mqtt/log:/mosquitto/log
     restart: unless-stopped
 
   watchtower:
@@ -181,7 +213,7 @@ services:
     environment:
       - PIHOLE_DNS_ = 127.0.0.1, 1.1.1.1
       - TZ = ${TZ}
-      - ServerIP = ${pi_hole_ip}
+      - ServerIP = ${PI_HOLE_IP}
     volumes:
       - ./etc-pihole/:/etc/pihole/
       - ./etc-dnsmasq.d/:/etc/dnsmasq.d/
@@ -189,7 +221,7 @@ services:
      - NET_ADMIN
     networks:
       macvlan_network:
-        ipv4_address: ${pi_hole_ip}
+        ipv4_address: ${PI_HOLE_IP}
     restart: unless-stopped
 
   autoheal:
@@ -251,19 +283,21 @@ services:
       - ${config}/speedtest:/config 
 
   plex:
-    image: plexinc/pms-docker #use linuxserver.io
+    image: lscr.io/linuxserver/plex
     container_name: plex
     network_mode: host
+    runtime: nvidia
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - VERSION=docker
+      - NVIDIA_VISIBLE_DEVICES=all
     ports:
       - 32400:32400
     volumes:
       - ${config}:/config
       - ${tv}:/tv
       - ${movies}:/movies
-      - ${transcode}:/transcode
     devices:
       - /dev/dri:/dev/dri
     restart: unless-stopped
@@ -273,7 +307,7 @@ networks:
     name: dockervlan
     driver: macvlan
     driver_opts:
-      parent: ${network_driver}
+      parent: ${NETWORK_DRIVER}
     ipam:
       config:
         - subnet: ${LAN_NETWORK}
