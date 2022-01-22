@@ -5,8 +5,10 @@ export $(egrep -v '^#' .env | xargs)
 
 apt install -y net-tools 
 #set static ip
-
-sed 's/${network_driver}/${network_driver}' ./01-network-manager-all.yaml
+sed -i 's@NETWORK_DRIVER@'"${NETWORK_DRIVER}"'@' 01-network-manager-all.yaml
+sed -i 's@IP_ADRESS@'"${IP_ADRESS}"'@' 01-network-manager-all.yaml
+sed -i 's@GATEWAY_IP@'"${GATEWAY_IP}"'@' 01-network-manager-all.yaml
+sed -i 's@NAMESERVER_IP@'"${NAMESERVER_IP}"'@' 01-network-manager-all.yaml
 cp ./01-network-manager-all.yaml /etc/netplan/01-network-manager-all.yaml
 netplan apply
 ifconfig

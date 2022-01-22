@@ -9,6 +9,3 @@ network:
           dhcp4: no
           nameservers:
               addresses: NAMESERVER_IP
-  
-
-
