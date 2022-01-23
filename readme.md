@@ -88,7 +88,7 @@ Singapore.ovpn <br />
 ```OVPN_DATA="ovpn-data"```<br />
 ```docker volume create --name $OVPN_DATA```<br />
 insert public ip or dynamic dns<br />
-i use tp link dynamic dns but dockdns or no ip works as well<br />
+i use tp link dynamic dns but duckdns or noip works will work as well<br />
 ```docker run -v $OVPN_DATA:/etc/openvpn --log-driver=none --rm kylemanna/openvpn ovpn_genconfig -u udp://PublicIP```<br />
 ```docker run -v $OVPN_DATA:/etc/openvpn --log-driver=none --rm -it kylemanna/openvpn ovpn_initpki```<br />
 ```docker run -v $OVPN_DATA:/etc/openvpn -d -p 1194:1194/udp --cap-add=NET_ADMIN kylemanna/openvpn```<br />
