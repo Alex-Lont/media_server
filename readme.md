@@ -1,5 +1,5 @@
 # Docker install of apps for media server
-***note i am using x86 architecture. I have not tested this with arm***<br />
+***Please note i am using x86 architecture. I have not tested this with arm***<br />
 Include docker compose for 20 containers <br />
 Designed for primarily as a media server <br />
 But used server monitoring and IOT/Home Automation <br />
@@ -89,7 +89,7 @@ Singapore.ovpn <br />
 ```docker volume create --name $OVPN_DATA```<br />
 insert public ip or dynamic dns<br />
 i use tp link dynamic dns but dockdns or no ip works as well<br />
-```docker run -v $OVPN_DATA:/etc/openvpn --log-driver=none --rm kylemanna/openvpn ovpn_genconfig -u udp://PublicIP``<br />
+```docker run -v $OVPN_DATA:/etc/openvpn --log-driver=none --rm kylemanna/openvpn ovpn_genconfig -u udp://PublicIP```<br />
 ```docker run -v $OVPN_DATA:/etc/openvpn --log-driver=none --rm -it kylemanna/openvpn ovpn_initpki```<br />
 ```docker run -v $OVPN_DATA:/etc/openvpn -d -p 1194:1194/udp --cap-add=NET_ADMIN kylemanna/openvpn```<br />
 ```docker run -v $OVPN_DATA:/etc/openvpn --log-driver=none --rm -it kylemanna/openvpn easyrsa build-client-full CLIENTNAME nopass```<br />
