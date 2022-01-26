@@ -1,4 +1,4 @@
-version: "3"
+version: "2"
 services:
   qbittorrent:
     image: 'markusmcnugen/qbittorrentvpn:latest'
@@ -194,7 +194,7 @@ services:
     restart: unless-stopped
 
   watchtower:
-    image: 'containerrr/watchtower:latest'
+    image: 'containrrr/watchtower:latest'
     container_name: watchtower
     environment:
       - WATCHTOWER_CLEANUP=true
@@ -202,33 +202,11 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
 
-  pihole:
-    image: 'pihole/pihole:latest'
-    container_name: pihole
-    ports:
-      - 53:53/tcp
-      - 53:53/udp
-      - 67:67/udp
-      - 80:80/tcp
-    environment:
-      - PIHOLE_DNS_ = 127.0.0.1, 1.1.1.1
-      - TZ = ${TZ}
-      - ServerIP = ${PI_HOLE_IP}
-    volumes:
-      - ./etc-pihole/:/etc/pihole/
-      - ./etc-dnsmasq.d/:/etc/dnsmasq.d/
-    cap_add:
-     - NET_ADMIN
-    networks:
-      macvlan_network:
-        ipv4_address: ${PI_HOLE_IP}
-    restart: unless-stopped
-
   homeassistant:
     image: 'ghcr.io/home-assistant/home-assistant:stable'
     container_name: homeassistant
     privileged: true
-    networks: host
+    network_mode: host
     ports:
       - 8123:8123
     environment:
@@ -274,10 +252,9 @@ services:
       - ${config}/speedtest:/config 
 
   plex:
-    image: lscr.io/linuxserver/plex
+    image: 'lscr.io/linuxserver/plex'
     container_name: plex
     network_mode: host
-    runtime: nvidia
     environment:
       - PGID=${PGID}
       - PUID=${PUID}
@@ -286,22 +263,67 @@ services:
     ports:
       - 32400:32400
     volumes:
-      - ${config}:/config
+      - ${config}/plex:/config
       - ${tv}:/tv
       - ${movies}:/movies
+      - ${transcode}:/trans
     devices:
       - /dev/dri:/dev/dri
     restart: unless-stopped
 
+  pihole:
+    image: 'pihole/pihole:latest'
+    container_name: pihole
+    ports:
+      - 53:53/tcp
+      - 53:53/udp
+      - 67:67/udp
+      - 80:80/tcp
+    environment:
+      - PIHOLE_DNS_=127.0.0.1
+      - PIHOLE_DNS_=1.1.1.1
+      - TZ=${TZ}
+      - ServerIP=${PI_HOLE_IP}
+    volumes:
+      - ${config}/pihole/etc-pihole/:/etc/pihole/
+      - ${config}/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/
+    cap_add:
+     - NET_ADMIN
+    networks:
+      dockervlan:
+        ipv4_address: ${PI_HOLE_IP}
+    restart: unless-stopped
+
+  nginx:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - '90:80'
+      - '91:81'
+      - '443:443'
+    volumes:
+      - ${config}/nginx/data:/data
+      - ${config}/nginx/letsencrypt:/etc/letsencrypt
+
+  cloudflare-ddns:
+    image: 'oznu/cloudflare-ddns:latest'
+    container_name: cloudflare
+    restart: always
+    environment:
+      - API_KEY=${CLOUDFLARE_API}
+      - ZONE=${DOMAIN_NAME}
+      - PROXIED=true
+      - PGID=${PGID}
+      - PUID=${PUID}
+
 networks:
   dockervlan:
-    name: dockervlan
     driver: macvlan
     driver_opts:
-      parent: ${NETWORK_DRIVER}
+      parent: enp0s31f6
     ipam:
       config:
-        - subnet: ${LAN_NETWORK}
-          ip_range: ${DOCKERNETWORK_IP_ADDRESS}
-          #ip range from .10 to .42 
-          gateway: ${DOCKERNETWORK_IP_RANGE}
+        - subnet: "192.168.68.0/24"
+          ip_range: "192.168.68.64/26"
+          gateway: "192.168.68.1"

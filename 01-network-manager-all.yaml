@@ -4,8 +4,8 @@ network:
   ethernets:
       NETWORK_DRIVER:
           addresses: 
-            - IP_ADRESS/24
+            - IP_ADRESS
           gateway4: GATEWAY_IP
-          dhcp4: no
+          dhcp4: yes
           nameservers:
               addresses: NAMESERVER_IP

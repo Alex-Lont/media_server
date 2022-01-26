@@ -69,9 +69,12 @@ https://hub.docker.com/r/henrywhitaker3/speedtest-tracker
 https://hub.docker.com/r/linuxserver/plex
 - OpenVPN
 https://hub.docker.com/r/kylemanna/openvpn
+- nginx
+https://nginxproxymanager.com/guide/#project-goal
+-Cloudflair dns
+https://hub.docker.com/r/oznu/cloudflare-ddns/
 
 # Coming soon
-- nginx Reverse proxy/SWAG
 - Fail2ban
 - NextCloud
 - Openvpn docker compose hopefully

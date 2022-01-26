@@ -1,2 +1,3 @@
 01-network-manager-all.yaml
 .env
+get-docker.sh
