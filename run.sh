@@ -62,3 +62,11 @@ sed -i 's@${DOCKERNETWORK_IP_RANGE}@'"${DOCKERNETWORK_IP_RANGE}"'@' docker-compo
 sed -i 's@${DOCKERGATEWAY_IP}@'"${DOCKERGATEWAY_IP}"'@' docker-compose.yml
 
 docker-compose up -d
+
+DOCKERLAN_NETWORK="192.168.68.0/24"
+DOCKERGATEWAY_IP="192.168.68.1"
+
+docker network create -d macvlan \
+  --subnet=192.168.68.0/24 \
+  --gateway=192.168.68.1 \
+  -o parent=enp0s31f6 priv_lan

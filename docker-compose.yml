@@ -1,4 +1,4 @@
-version: "2"
+version: "3.6"
 services:
   qbittorrent:
     image: 'markusmcnugen/qbittorrentvpn:latest'
@@ -101,19 +101,19 @@ services:
       - TZ=${TZ}
     restart: unless-stopped
 
-  wireshark:
-    image: 'linuxserver/wireshark:latest'
-    container_name: wireshark
-    cap_add:
-      - NET_ADMIN
-    network_mode: host
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ${config}/wireshark:/config
-    restart: unless-stopped
+  # wireshark:
+  #   image: 'linuxserver/wireshark:latest'
+  #   container_name: wireshark
+  #   cap_add:
+  #     - NET_ADMIN
+  #   network_mode: host
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #   volumes:
+  #     - ${config}/wireshark:/config
+  #   restart: unless-stopped
 
   code-server:
     image: 'linuxserver/code-server:latest'
@@ -193,14 +193,14 @@ services:
       - ${config}/mqtt/log:/mosquitto/log
     restart: unless-stopped
 
-  watchtower:
-    image: 'containrrr/watchtower:latest'
-    container_name: watchtower
-    environment:
-      - WATCHTOWER_CLEANUP=true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
+  # watchtower:
+  #   image: 'containrrr/watchtower:latest'
+  #   container_name: watchtower
+  #   environment:
+  #     - WATCHTOWER_CLEANUP=true
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   restart: unless-stopped
 
   homeassistant:
     image: 'ghcr.io/home-assistant/home-assistant:stable'
@@ -233,7 +233,7 @@ services:
     container_name: dozzle
     restart: unless-stopped
     ports:
-      - 8888:8888
+      - 8888:8080
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
@@ -263,10 +263,9 @@ services:
     ports:
       - 32400:32400
     volumes:
-      - ${config}/plex:/config
+      - ${plex}:/config
       - ${tv}:/tv
       - ${movies}:/movies
-      - ${transcode}:/trans
     devices:
       - /dev/dri:/dev/dri
     restart: unless-stopped
@@ -280,8 +279,10 @@ services:
       - 67:67/udp
       - 80:80/tcp
     environment:
-      - PIHOLE_DNS_=127.0.0.1
-      - PIHOLE_DNS_=1.1.1.1
+      - DNS1=${CLOUD_DNS}
+      - DNS2=no
+      - DNSMASQ_LISTENING=all
+      - WEBPASSWORD=${PASSWORD}
       - TZ=${TZ}
       - ServerIP=${PI_HOLE_IP}
     volumes:
@@ -290,9 +291,25 @@ services:
     cap_add:
      - NET_ADMIN
     networks:
-      dockervlan:
+      priv_lan:
         ipv4_address: ${PI_HOLE_IP}
     restart: unless-stopped
+
+  cloudflared:
+    container_name: cloudflared
+    restart: unless-stopped
+    image: 'cloudflare/cloudflared:2022.1.2-amd64'
+    command: proxy-dns
+    environment:
+      - TUNNEL_DNS_UPSTREAM=https://1.1.1.1/dns-query,https://1.0.0.1/dns-query,https://9.9.9.9/dns-query,https://149.112.112.9/dns-query
+      - TUNNEL_METRICS=0.0.0.0:49312
+      - TUNNEL_DNS_ADDRESS=0.0.0.0
+      - TUNNEL_DNS_PORT=53
+    sysctls:
+      - net.ipv4.ip_unprivileged_port_start=53
+    networks:
+      priv_lan:
+        ipv4_address: ${CLOUD_IP}
 
   nginx:
     image: 'jc21/nginx-proxy-manager:latest'
@@ -317,13 +334,31 @@ services:
       - PGID=${PGID}
       - PUID=${PUID}
 
+  # wireguard:
+  #     image: lscr.io/linuxserver/wireguard
+  #     container_name: wireguard
+  #     cap_add:
+  #       - NET_ADMIN
+  #       - SYS_MODULE
+  #     environment:
+  #       - PUID=${PUID}
+  #       - PGID=${PGID}
+  #       - TZ=${TZ}
+  #       - SERVERURL=${DYNAMIC_DNS_NAME} #optional
+  #       - SERVERPORT=51820 #optional
+  #       - PEERS=1 #optional
+  #       - PEERDNS=auto #optional
+  #       - INTERNAL_SUBNET=10.13.13.0 #optional
+  #     volumes:
+  #       - ${config}/wireguard/config:/config
+  #       - /lib/modules:/lib/modules
+  #     ports:
+  #       - 51820:51820/udp
+  #     sysctls:
+  #       - net.ipv4.conf.all.src_valid_mark=1
+  #     restart: unless-stopped
+
 networks:
-  dockervlan:
-    driver: macvlan
-    driver_opts:
-      parent: enp0s31f6
-    ipam:
-      config:
-        - subnet: "192.168.68.0/24"
-          ip_range: "192.168.68.64/26"
-          gateway: "192.168.68.1"
+  priv_lan:
+    external:
+      name: priv_lan

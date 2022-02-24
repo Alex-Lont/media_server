@@ -39,7 +39,7 @@ https://hub.docker.com/r/linuxserver/sonarr
 https://hub.docker.com/r/linuxserver/bazarr
 - Organizr
 https://hub.docker.com/r/organizr/organizr
-- Wireshark
+- Wireshark (commented out)
 https://hub.docker.com/r/linuxserver/wireshark
 - Code-server
 https://hub.docker.com/r/linuxserver/code-server
@@ -53,10 +53,8 @@ https://hub.docker.com/r/grafana/grafana
 https://hub.docker.com/r/nodered/node-red
 - Mosquitto MQTT
 https://hub.docker.com/_/eclipse-mosquitto
-- Watchtower
+- Watchtower (commented out)
 https://hub.docker.com/r/containrrr/watchtower
-- PiHole
-https://hub.docker.com/r/pihole/pihole
 - Home Assistant
 https://hub.docker.com/r/homeassistant/home-assistant
 - Portainer-ce
@@ -67,17 +65,21 @@ https://hub.docker.com/r/amir20/dozzle
 https://hub.docker.com/r/henrywhitaker3/speedtest-tracker
 - Plex
 https://hub.docker.com/r/linuxserver/plex
-- OpenVPN
-https://hub.docker.com/r/kylemanna/openvpn
+- PiHole
+https://hub.docker.com/r/pihole/pihole
+- Cloudflared
+https://hub.docker.com/r/cloudflare/cloudflared
 - nginx
 https://nginxproxymanager.com/guide/#project-goal
--Cloudflair dns
+- PiHole
+https://hub.docker.com/r/pihole/pihole
+- Cloudflair dns
 https://hub.docker.com/r/oznu/cloudflare-ddns/
-
+- Wireguard (commented out)
+https://hub.docker.com/r/linuxserver/wireguard
 # Coming soon
 - Fail2ban
 - NextCloud
-- Openvpn docker compose hopefully
 
 # For vpn apps qbit and jacket
 vpn files in config <br />
@@ -87,6 +89,8 @@ ca.rsa.4096.pem <br />
 Singapore.ovpn <br />
 
 # Openvpn via docker cli
+- OpenVPN
+https://hub.docker.com/r/kylemanna/openvpn<br />
 
 ```OVPN_DATA="ovpn-data"```<br />
 ```docker volume create --name $OVPN_DATA```<br />
