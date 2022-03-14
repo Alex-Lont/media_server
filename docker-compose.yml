@@ -101,6 +101,20 @@ services:
       - TZ=${TZ}
     restart: unless-stopped
 
+  heimdall:
+    image: 'linuxserver/heimdall'
+    container_name: heimdall
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${config}/heimdall:/config
+    ports:
+      - 88:80
+      - 4443:443
+    restart: unless-stopped
+
   # wireshark:
   #   image: 'linuxserver/wireshark:latest'
   #   container_name: wireshark
@@ -193,14 +207,14 @@ services:
       - ${config}/mqtt/log:/mosquitto/log
     restart: unless-stopped
 
-  # watchtower:
-  #   image: 'containrrr/watchtower:latest'
-  #   container_name: watchtower
-  #   environment:
-  #     - WATCHTOWER_CLEANUP=true
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   restart: unless-stopped
+  watchtower:
+    image: 'containrrr/watchtower:latest'
+    container_name: watchtower
+    environment:
+      - WATCHTOWER_CLEANUP=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
 
   homeassistant:
     image: 'ghcr.io/home-assistant/home-assistant:stable'
