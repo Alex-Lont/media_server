@@ -94,13 +94,13 @@ https://hub.docker.com/r/linuxserver/heimdall
 ```docker compose up -d --force-recreate```
 
 # Updating
-uncomment watchtower in docker compose. 
-update manually via watch tower
-```docker run -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once```
-update manually
-```docker compose pull```
-```docker compose up -d```
-```docker image prune -a```
+uncomment watchtower in docker compose. <br />
+update manually via watch tower. <br />
+```docker run -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once``` <br />
+update manually <br />
+```docker compose pull``` <br />
+```docker compose up -d``` <br />
+```docker image prune -a``` <br />
 
 # For vpn apps qbit and jacket
 vpn files in config <br />
