@@ -1,6 +1,6 @@
 # Docker install of apps for media server
 ***Please note i am using x86 architecture. I have not tested this with arm***<br />
-Include docker compose for 20 containers <br />
+Include docker compose for 28 containers <br />
 Designed for primarily as a media server <br />
 But used server monitoring and IOT/Home Automation <br />
 
@@ -37,7 +37,7 @@ https://hub.docker.com/r/linuxserver/radarr
 https://hub.docker.com/r/linuxserver/sonarr
 - Bazarr
 https://hub.docker.com/r/linuxserver/bazarr
-- Organizr
+- Organizr (commented out)
 https://hub.docker.com/r/organizr/organizr
 - Wireshark (commented out)
 https://hub.docker.com/r/linuxserver/wireshark
@@ -69,7 +69,7 @@ https://hub.docker.com/r/linuxserver/plex
 https://hub.docker.com/r/pihole/pihole
 - Cloudflared
 https://hub.docker.com/r/cloudflare/cloudflared
-- nginx
+- Nginx
 https://nginxproxymanager.com/guide/#project-goal
 - PiHole
 https://hub.docker.com/r/pihole/pihole
@@ -79,11 +79,28 @@ https://hub.docker.com/r/oznu/cloudflare-ddns/
 https://hub.docker.com/r/linuxserver/wireguard
 - Tdarr
 https://hub.docker.com/r/haveagitgat/tdarr
+- Homarr
+https://github.com/ajnart/homarr
+- NextCloud
+https://hub.docker.com/r/linuxserver/nextcloud
+- Heimdall (commented out)
+https://hub.docker.com/r/linuxserver/heimdall
 
 # Coming soon
 - Fail2ban
-- NextCloud
 - influxdb
+
+# Force recreate
+```docker compose up -d --force-recreate```
+
+# Updating
+uncomment watchtower in docker compose. 
+update manually via watch tower
+```docker run -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once```
+update manually
+```docker compose pull```
+```docker compose up -d```
+```docker image prune -a```
 
 # For vpn apps qbit and jacket
 vpn files in config <br />

@@ -3,7 +3,7 @@ services:
   qbittorrent:
     image: 'markusmcnugen/qbittorrentvpn:latest'
     container_name: qbittorrentvpn
-    privileged: true 
+    privileged: true
     environment:
       - VPN_USERNAME=${VPN_USERNAME}
       - VPN_PASSWORD=${VPN_PASSWORD}
@@ -11,7 +11,7 @@ services:
       - PGID=${PGID}
       - VPN_ENABLED=yes
       - LAN_NETWORK=${LAN_NETWORK}
-      - NAME_SERVERS=8.8.8.8,8.8.4.4
+      - NAME_SERVERS=8.8.8.8,1.1.1.1
     volumes:
       - ${config}/qbittorrent:/config
       - ${downloads}:/downloads
@@ -39,7 +39,7 @@ services:
     ports:
       - 9117:9117
     restart: unless-stopped
-  
+
   radarr:
     image: 'linuxserver/radarr:latest'
     container_name: radarr
@@ -85,35 +85,42 @@ services:
       - 6767:6767
     restart: unless-stopped
 
-  organizr:
-    container_name: organizr
-    hostname: organizr
-    image: 'organizr/organizr:latest'
-    ports:
-      - 80:80
-    volumes:
-      - ${config}/organizr:/config
-    environment:
-      - fpm=true #true or false | using true will provide better performance
-      - branch=v2-master #v2-master or #v2-develop
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    restart: unless-stopped
+  # organizr:
+  #   container_name: organizr
+  #   hostname: organizr
+  #   image: 'organizr/organizr:latest'
+  #   ports:
+  #     - 80:80
+  #   volumes:
+  #     - ${config}/organizr:/config
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #   restart: unless-stopped
 
-  heimdall:
-    image: 'linuxserver/heimdall'
-    container_name: heimdall
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ${config}/heimdall:/config
-    ports:
-      - 88:80
-      - 4443:443
+  homarr:
+    container_name: homarr
+    image: ghcr.io/ajnart/homarr:latest
     restart: unless-stopped
+    volumes:
+      - /data/docker/homarr:/app/data/configs
+    ports:
+      - 80:7575
+
+  # heimdall:
+  #   image: 'linuxserver/heimdall'
+  #   container_name: heimdall
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #   volumes:
+  #     - ${config}/heimdall:/config
+  #   ports:
+  #     - 88:80
+  #     - 4443:443
+  #   restart: unless-stopped
 
   # wireshark:
   #   image: 'linuxserver/wireshark:latest'
@@ -171,7 +178,7 @@ services:
     ports:
       - 9292:9090
     restart: unless-stopped
-    
+
   grafana:
     image: 'grafana/grafana:latest'
     container_name: grafana
@@ -203,18 +210,18 @@ services:
       - 9001:9001
     volumes:
       - ${config}/mqtt/config:/mosquitto/config
-      - ${config}/mqtt/data:/mosquitto/data 
+      - ${config}/mqtt/data:/mosquitto/data
       - ${config}/mqtt/log:/mosquitto/log
     restart: unless-stopped
 
-  watchtower:
-    image: 'containrrr/watchtower:latest'
-    container_name: watchtower
-    environment:
-      - WATCHTOWER_CLEANUP=true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
+  # watchtower:
+  #   image: 'containrrr/watchtower:latest'
+  #   container_name: watchtower
+  #   environment:
+  #     - WATCHTOWER_CLEANUP=true
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   restart: unless-stopped
 
   homeassistant:
     image: 'ghcr.io/home-assistant/home-assistant:stable'
@@ -238,8 +245,8 @@ services:
       - 8000:8000
       - 9443:9443
     volumes:
-      - /var/lib/docker/volumes:/var/lib/docker/volumes 
-      - /var/run/docker.sock:/var/run/docker.sock 
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+      - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
 
   dozzle:
@@ -263,7 +270,7 @@ services:
       - PUID=${PUID}
       - OOKLA_EULA_GDPR=true
     volumes:
-      - ${config}/speedtest:/config 
+      - ${config}/speedtest:/config
 
   plex:
     image: 'lscr.io/linuxserver/plex'
@@ -294,7 +301,7 @@ services:
   pihole:
     image: 'pihole/pihole:latest'
     container_name: pihole
-    hostname: pihole
+    hostname: pihole-host
     ports:
       - 53:53/tcp
       - 53:53/udp
@@ -311,7 +318,7 @@ services:
       - ${config}/pihole/etc-pihole/:/etc/pihole/
       - ${config}/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/
     cap_add:
-     - NET_ADMIN
+      - NET_ADMIN
     networks:
       priv_lan:
         ipv4_address: ${PI_HOLE_IP}
@@ -342,7 +349,7 @@ services:
     ports:
       - '90:80'
       - '91:81'
-      - '443:443'
+      - '4443:443'
     volumes:
       - ${config}/nginx/data:/data
       - ${config}/nginx/letsencrypt:/etc/letsencrypt
@@ -418,11 +425,22 @@ services:
         reservations:
           devices:
             - capabilities:
-              - gpu
+                - gpu
+
+  nextcloud:
+    image: lscr.io/linuxserver/nextcloud:latest
+    container_name: nextcloud
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${config}/nextcloud/appdata:/config
+      - ${homecloud}/data:/data
+    ports:
+      - 443:443
+    restart: unless-stopped
 
 networks:
   priv_lan:
-    external:
-      name: priv_lan
-  # proxy:
-  #   external: true
+    name: priv_lan

@@ -21,6 +21,9 @@ else
     ifconfig
 fi
 
+# set DNS 
+#/etc/resolv.conf
+
 echo "You must manually run docker installation file"
 read -p "Is Docker installed" -n 1 -r
 if [[ ! $REPLY =~ ^[Yy]$ ]]
