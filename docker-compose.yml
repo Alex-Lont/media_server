@@ -223,18 +223,18 @@ services:
   #     - /var/run/docker.sock:/var/run/docker.sock
   #   restart: unless-stopped
 
-  homeassistant:
-    image: 'ghcr.io/home-assistant/home-assistant:stable'
-    container_name: homeassistant
-    privileged: true
-    network_mode: host
-    ports:
-      - 8123:8123
-    environment:
-      - TZ=${TZ}
-    volumes:
-      - ${config}/homeassistant:/config
-    restart: unless-stopped
+  # homeassistant:
+  #   image: 'ghcr.io/home-assistant/home-assistant:stable'
+  #   container_name: homeassistant
+  #   privileged: true
+  #   network_mode: host
+  #   ports:
+  #     - 8123:8123
+  #   environment:
+  #     - TZ=${TZ}
+  #   volumes:
+  #     - ${config}/homeassistant:/config
+  #   restart: unless-stopped
 
   portainer:
     image: 'portainer/portainer-ce'
